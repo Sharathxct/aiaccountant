@@ -1,4 +1,4 @@
-import { LoginForm } from "@workspace/ui/components/login-form"
+import { LoginForm } from "@workspace/ui/components/signup-form"
 
 export default function Page() {
   return (
