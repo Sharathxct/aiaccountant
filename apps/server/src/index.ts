@@ -9,7 +9,7 @@ app.use(express.json());
 
 // Sample route
 app.get('/', (req, res) => {
-  res.send('Hello from the Express server with TypeScript!');
+  res.send({"status":"healthy"});
 });
 
 // Start the server

@@ -18,3 +18,33 @@ model User {
   email String  @unique
   name  String?
 }
+
+model Organisation {
+  id       String  @id @default(uuid())
+  admin    String  @relation(fields: [adminId], references: [id])
+  adminId  String
+  name     String
+}
+
+model PurchaseOrder {
+  id                String   @id @default(uuid())
+  date              DateTime
+  product           String
+  quantity          Int
+  price             Float
+  vendor            String
+  poNumber          String   @unique
+  termsOfDelivery   String
+  termsOfPayment    String
+}
+
+model Invoice {
+  id                String   @id @default(uuid())
+  date              DateTime
+  customerName      String
+  totalAmount       Float
+  status            String
+  invoiceNumber     String   @unique
+  termsOfPayment    String
+  dueDate           DateTime
+}
