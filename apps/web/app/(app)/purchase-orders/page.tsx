@@ -29,7 +29,10 @@ export default function PurchaseOrdersPage() {
   useEffect(() => {
     const fetchPurchaseOrders = async () => {
       try {
-        const res = await fetch("/api/purchase-orders")
+        const res = await fetch("/api/purchase-orders", {
+          method: "GET",
+          credentials: "include",
+        })
         const data = await res.json()
         setPurchaseOrders(data)
       } catch (error) {

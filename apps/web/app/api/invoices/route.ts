@@ -1,22 +1,25 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { prisma } from "@workspace/db" // Adjust the import based on your structure
+import * as jose from "jose"
+import { prisma } from "@workspace/db"
 
-export async function GET() {
+const JWT_SECRET = new TextEncoder().encode("mysecret");
+
+export async function GET(req: Request) {
   try {
-    const session = await getServerSession()
-    
-    if (!session?.user?.email) {
-      return new NextResponse("Unauthorized", { status: 401 })
+    const token = req.cookies.get("token")?.value;
+
+    if (!token) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const { payload } = await jose.jwtVerify(token, JWT_SECRET);
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { id: payload.userId as string },
       include: { organisations: true }
-    })
+    });
 
-    if (!user || user.organisations.length === 0) {
-      return new NextResponse("No organization found", { status: 404 })
+    if (!user || !user.organisations || user.organisations.length === 0) {
+      return new NextResponse("No organization found", { status: 404 });
     }
 
     const invoices = await prisma.invoice.findMany({
@@ -35,11 +38,11 @@ export async function GET() {
         invoiceNumber: true,
         document: true,
       }
-    })
+    });
 
-    return NextResponse.json(invoices)
+    return NextResponse.json(invoices);
   } catch (error) {
-    console.error("[INVOICES_GET]", error)
-    return new NextResponse("Internal Error", { status: 500 })
+    console.error("[INVOICES_GET]", error);
+    return new NextResponse("Internal Error", { status: 500 });
   }
 } 

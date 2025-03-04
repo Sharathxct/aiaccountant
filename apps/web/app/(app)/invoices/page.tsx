@@ -26,7 +26,10 @@ export default function InvoicesPage() {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const res = await fetch("/api/invoices")
+        const res = await fetch("/api/invoices", {
+          method: "GET",
+          credentials: "include",
+        })
         const data = await res.json()
         setInvoices(data)
       } catch (error) {
