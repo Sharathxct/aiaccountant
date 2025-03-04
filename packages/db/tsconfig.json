@@ -1,0 +1,10 @@
+{
+  "extends": "@workspace/typescript-config/base.json",
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true
+  }
+}
