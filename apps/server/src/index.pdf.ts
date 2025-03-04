@@ -1,4 +1,5 @@
 import PDFDocument from 'pdfkit'; 
+import dotenv from 'dotenv';
 import fs from 'fs';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 interface InvoiceItem {
@@ -165,14 +166,15 @@ async function generateGSTInvoice(email: string, invoiceData: InvoiceData) {
   console.log('PDF invoice generated: invoice.pdf');
   //
   try {
-   // AWS S3 Configuration
-   const s3 = new S3Client({ 
-     region: 'ap-south-1',
-     credentials: {
-       accessKeyId: 'AKIA44Y6CATPWMRUCTY5', 
-       secretAccessKey: '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' 
-     },
-   });
+  // AWS S3 Configuration
+const s3 = new S3Client({
+   region: process.env.AWS_REGION,
+   credentials: {
+     accessKeyId: process.env.AWS_ACCESS_KEY_ID!, // Non-null assertion operator added 
+     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY! // Non-null assertion operator added
+   },
+ });
+    
   const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
    const buffers: Buffer[] = [];
    doc.on('data', (chunk) => buffers.push(chunk));
@@ -184,7 +186,7 @@ async function generateGSTInvoice(email: string, invoiceData: InvoiceData) {
 
  // Upload to S3 
  const params = {
-   Bucket: 'accountant-app', 
+   Bucket: process.env.AWS_BUCKET_NAME, 
    Key: `invoices/invoice-${invoiceData.invoiceNumber}-${Date.now()}.pdf`, 
    Body: pdfBuffer, 
    ContentType: 'application/pdf', 
