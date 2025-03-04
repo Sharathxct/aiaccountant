@@ -16,14 +16,33 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "./s
 
 export function NavUser({
   user,
+  onLogout,
 }: {
   user: {
     name: string
     email: string
     avatar: string
   }
+  onLogout?: () => void
 }) {
   const { isMobile } = useSidebar()
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+
+      onLogout?.();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -86,7 +105,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

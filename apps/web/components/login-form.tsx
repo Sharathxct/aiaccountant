@@ -1,3 +1,5 @@
+"use client"
+
 import type React from "react"
 import { cn } from "@workspace/ui/lib/utils"
 import { Button } from "@workspace/ui/components/button"
@@ -5,45 +7,139 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@work
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import Link from 'next/link'
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
-export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
+export function LoginForm() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSignup, setIsSignup] = useState(false);
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsLoading(true);
+
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const name = formData.get("name") as string;
+
+    try {
+      const response = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          password,
+          name,
+          action: isSignup ? "signup" : "login",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Enter your email below to login to your account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="m@example.com" required />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a href="#" className="ml-auto inline-block text-sm underline-offset-4 hover:underline">
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input id="password" type="password" required />
-              </div>
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
+    <div className="grid gap-6">
+      <div className="grid gap-2 text-center">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {isSignup ? "Create an account" : "Welcome back"}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {isSignup
+            ? "Enter your details to create your account"
+            : "Enter your credentials to access your account"}
+        </p>
+      </div>
+      <form onSubmit={onSubmit}>
+        <div className="grid gap-4">
+          {isSignup && (
+            <div className="grid gap-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                placeholder="John Doe"
+                type="text"
+                autoCapitalize="none"
+                autoCorrect="off"
+                disabled={isLoading}
+                required={isSignup}
+              />
             </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link href="/signup" className="underline underline-offset-4">
-                Sign up
-              </Link>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+          )}
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              placeholder="name@example.com"
+              type="email"
+              autoCapitalize="none"
+              autoComplete="email"
+              autoCorrect="off"
+              disabled={isLoading}
+              required
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              disabled={isLoading}
+              required
+            />
+          </div>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              "Loading..."
+            ) : isSignup ? (
+              "Create account"
+            ) : (
+              "Sign in"
+            )}
+          </Button>
+        </div>
+      </form>
+      <div className="text-center text-sm">
+        {isSignup ? (
+          <>
+            Already have an account?{" "}
+            <button
+              className="underline"
+              onClick={() => setIsSignup(false)}
+              type="button"
+            >
+              Sign in
+            </button>
+          </>
+        ) : (
+          <>
+            Don't have an account?{" "}
+            <button
+              className="underline"
+              onClick={() => setIsSignup(true)}
+              type="button"
+            >
+              Create one
+            </button>
+          </>
+        )}
+      </div>
     </div>
-  )
+  );
 }
 

@@ -53,110 +53,113 @@ const data = {
   navMain: [
     {
       title: "Playground",
-      url: "#",
       icon: SquareTerminal,
-      isActive: true,
+      url: "/playground",
       items: [
         {
           title: "History",
-          url: "#",
+          url: "/playground/history",
         },
         {
           title: "Starred",
-          url: "#",
+          url: "/playground/starred",
         },
         {
           title: "Settings",
-          url: "#",
+          url: "/playground/settings",
         },
       ],
     },
     {
       title: "Models",
-      url: "#",
       icon: Bot,
+      url: "/models",
       items: [
         {
           title: "Genesis",
-          url: "#",
+          url: "/models/genesis",
         },
         {
           title: "Explorer",
-          url: "#",
+          url: "/models/explorer",
         },
         {
           title: "Quantum",
-          url: "#",
+          url: "/models/quantum",
         },
       ],
     },
     {
       title: "Documentation",
-      url: "#",
       icon: BookOpen,
+      url: "/docs",
       items: [
         {
           title: "Introduction",
-          url: "#",
+          url: "/docs/introduction",
         },
         {
           title: "Get Started",
-          url: "#",
+          url: "/docs/get-started",
         },
         {
           title: "Tutorials",
-          url: "#",
+          url: "/docs/tutorials",
         },
         {
           title: "Changelog",
-          url: "#",
+          url: "/docs/changelog",
         },
       ],
     },
     {
       title: "Settings",
-      url: "#",
       icon: Settings2,
+      url: "/settings",
       items: [
         {
           title: "General",
-          url: "#",
+          url: "/settings/general",
         },
         {
           title: "Team",
-          url: "#",
+          url: "/settings/team",
         },
         {
           title: "Billing",
-          url: "#",
+          url: "/settings/billing",
         },
         {
           title: "Limits",
-          url: "#",
+          url: "/settings/limits",
         },
       ],
     },
   ],
   projects: [
     {
-      name: "Design Engineering",
-      url: "#",
+      name: "Genesis",
       icon: Frame,
+      url: "/projects/genesis",
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
+      name: "Explorer",
       icon: Map,
+      url: "/projects/explorer",
+    },
+    {
+      name: "Quantum",
+      icon: PieChart,
+      url: "/projects/quantum",
     },
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  onLogout?: () => void
+}
+
+export function AppSidebar({ onLogout, ...props }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -167,7 +170,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={data.user} onLogout={onLogout} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
