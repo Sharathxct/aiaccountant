@@ -1,4 +1,4 @@
-import { SignUpForm } from "@workspace/ui/components/signup-form"
+import { SignUpForm } from "@/components/signup-form"
 
 export default function Page() {
   return (
@@ -9,4 +9,5 @@ export default function Page() {
     </div>
   )
 }
+
 
