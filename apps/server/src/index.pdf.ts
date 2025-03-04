@@ -1,6 +1,7 @@
 import PDFDocument from 'pdfkit'; 
+import dotenv from 'dotenv';
 import fs from 'fs';
-
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 interface InvoiceItem {
   description: string;
   quantity: number;
@@ -18,12 +19,13 @@ interface InvoiceData {
   totalAmount: number;
 }
 
-function generateGSTInvoice(email: string, invoiceData: InvoiceData) {
+async function generateGSTInvoice(email: string, invoiceData: InvoiceData) {
   // Create a new PDF document
   const doc = new PDFDocument({ margin: 50, size: 'A4' });
 
   // Pipe the PDF output to a file
   doc.pipe(fs.createWriteStream('invoice.pdf'));
+  
 
   // Colors
   const headerColor = '#2c3e50';
@@ -160,11 +162,46 @@ function generateGSTInvoice(email: string, invoiceData: InvoiceData) {
      .text('Payment Terms: Due within 30 days', pageMargin, doc.y)
      .text('Thank you for your business!', pageMargin, doc.y + 10);
 
-  // Finalize the PDF
-  doc.end();
 
   console.log('PDF invoice generated: invoice.pdf');
+  //
+  try {
+  // AWS S3 Configuration
+const s3 = new S3Client({
+   region: process.env.AWS_REGION,
+   credentials: {
+     accessKeyId: process.env.AWS_ACCESS_KEY_ID!, // Non-null assertion operator added 
+     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY! // Non-null assertion operator added
+   },
+ });
+    
+  const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
+   const buffers: Buffer[] = [];
+   doc.on('data', (chunk) => buffers.push(chunk));
+   doc.on('end', () => resolve(Buffer.concat(buffers)));
+   doc.on('error', (err) => reject(err));
+   // Finalize the PDF
+   doc.end(); 
+ });
+
+ // Upload to S3 
+ const params = {
+   Bucket: process.env.AWS_BUCKET_NAME, 
+   Key: `invoices/invoice-${invoiceData.invoiceNumber}-${Date.now()}.pdf`, 
+   Body: pdfBuffer, 
+   ContentType: 'application/pdf', 
+ };
+
+ const command = new PutObjectCommand(params);
+ await s3.send(command); 
+
+ console.log('PDF invoice uploaded to S3:', params.Key);
+
+} catch (error) {
+ console.error('Error uploading to S3:', error);
+} 
 }
+//
 
 // Example Invoice Data
 export const invoiceData: InvoiceData = {

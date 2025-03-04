@@ -8,6 +8,7 @@
     "dev": "nodemon --exec ts-node src/index.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.758.0",
     "@types/imap": "^0.8.42",
     "@types/mailparser": "^3.4.5",
     "@types/pdfkit": "^0.13.9",

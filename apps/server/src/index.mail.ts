@@ -10,8 +10,8 @@ dotenv.config();
 
 // IMAP Configuration (replace placeholders with your actual credentials)
 const imapConfig: Imap.Config = {
-  user: process.env.EMAIL_USER || '',
-  password: process.env.EMAIL_PASS || '', 
+  user: 'autoinvoice.billing@gmail.com',
+  password: 'vzafpkluewtnqpab', 
   host: 'imap.gmail.com',
   port: 993,
   tls: true,
