@@ -10,6 +10,7 @@
   "dependencies": {
     "@types/imap": "^0.8.42",
     "@types/mailparser": "^3.4.5",
+    "@types/pdfkit": "^0.13.9",
     "@workspace/db": "workspace:*",
     "dotenv": "^16.4.7",
     "express": "^4.18.2",
