@@ -10,12 +10,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@types/jsonwebtoken": "^9.0.9",
+    "@types/date-fns": "^2.6.3",
     "@types/tailwindcss": "^3.1.0",
     "@workspace/db": "workspace:*",
     "@workspace/ui": "workspace:*",
     "bcryptjs": "^3.0.2",
-    "jsonwebtoken": "^9.0.2",
+    "date-fns": "^4.1.0",
+    "jose": "^6.0.8",
     "lucide-react": "0.456.0",
     "next": "^15.1.0",
     "next-auth": "^4.24.11",

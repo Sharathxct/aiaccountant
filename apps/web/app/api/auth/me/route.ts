@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { prisma } from "@workspace/db";
 import * as jose from "jose";
+import { prisma } from "@workspace/db";
 
 const JWT_SECRET = new TextEncoder().encode("mysecret");
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const token = req.cookies.get("token")?.value;
 
@@ -13,15 +13,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
-      );
-    }
-
-    const { name } = await req.json();
-
-    if (!name) {
-      return NextResponse.json(
-        { error: "Organization name is required" },
-        { status: 400 }
       );
     }
 
@@ -38,23 +29,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (user.organisations.length > 0) {
-      return NextResponse.json(
-        { error: "User already has an organization" },
-        { status: 400 }
-      );
-    }
-
-    const organisation = await prisma.organisation.create({
-      data: {
-        name,
-        adminId: user.id
-      }
-    });
-
-    return NextResponse.json({ success: true, organisation });
+    // Remove sensitive data
+    const { password, ...safeUser } = user;
+    return NextResponse.json({ user: safeUser });
   } catch (error) {
-    console.error("Organization creation error:", error);
+    console.error("Auth error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

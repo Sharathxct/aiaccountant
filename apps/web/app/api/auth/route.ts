@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@workspace/db";
 import * as bcrypt from "bcryptjs";
-import * as jwt from "jsonwebtoken";
+import * as jose from "jose";
 
-const JWT_SECRET = "mysecret";
+const JWT_SECRET = new TextEncoder().encode("mysecret");
+const alg = "HS256";
 
 export async function POST(req: Request) {
   try {
@@ -30,9 +31,10 @@ export async function POST(req: Request) {
         }
       });
 
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
-        expiresIn: "7d"
-      });
+      const token = await new jose.SignJWT({ userId: user.id })
+        .setProtectedHeader({ alg })
+        .setExpirationTime("7d")
+        .sign(JWT_SECRET);
 
       const response = NextResponse.json(
         { success: true, user: { id: user.id, email: user.email, name: user.name } },
@@ -70,9 +72,10 @@ export async function POST(req: Request) {
         );
       }
 
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
-        expiresIn: "7d"
-      });
+      const token = await new jose.SignJWT({ userId: user.id })
+        .setProtectedHeader({ alg })
+        .setExpirationTime("7d")
+        .sign(JWT_SECRET);
 
       const response = NextResponse.json(
         { success: true, user: { id: user.id, email: user.email, name: user.name } }

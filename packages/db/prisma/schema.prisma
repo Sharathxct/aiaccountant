@@ -23,31 +23,43 @@ model User {
 }
 
 model Organisation {
-  id       String  @id @default(uuid())
-  admin    User    @relation(fields: [adminId], references: [id])
-  adminId  String
-  name     String
+  id              String           @id @default(uuid())
+  admin           User             @relation(fields: [adminId], references: [id])
+  adminId         String
+  name            String
+  purchaseOrders  PurchaseOrder[]
+  invoices        Invoice[]
 }
 
 model PurchaseOrder {
-  id                String   @id @default(uuid())
+  id                String        @id @default(uuid())
+  organisation      Organisation  @relation(fields: [organisationId], references: [id])
+  organisationId    String
   date              DateTime
   product           String
   quantity          Int
   price             Float
   vendor            String
-  poNumber          String   @unique
+  poNumber          String        @unique
   termsOfDelivery   String
   termsOfPayment    String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  document          String?
 }
 
 model Invoice {
-  id                String   @id @default(uuid())
+  id                String        @id @default(uuid())
+  organisation      Organisation  @relation(fields: [organisationId], references: [id])
+  organisationId    String
   date              DateTime
   customerName      String
   totalAmount       Float
   status            String
-  invoiceNumber     String   @unique
+  invoiceNumber     String        @unique
   termsOfPayment    String
   dueDate           DateTime
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  document          String?
 }
